@@ -9,3 +9,7 @@
     name: nginx
     state: restarted
 
+- name: restart ttrss-update-daemon
+  service:
+    name: ttrss-update-daemon
+    state: restarted

@@ -16,7 +16,7 @@ ttrss_ssl_key_file: /etc/ssl/private/{{ ttrss_hostname|replace(".", "_") }}.key
 
 ttrss_url: https://{{ ttrss_hostname }}/
 
-ttrss_admin_username: root
+ttrss_admin_username: admin
 ttrss_admin_password: password
 ttrss_admin_password_salt: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-admin-password-salt length=8') }}"
 ttrss_admin_email: "{{ ttrss_admin_username }}@{{ ttrss_hostname }}"

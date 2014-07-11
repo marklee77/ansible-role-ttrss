@@ -121,6 +121,16 @@
     group: ttrss
     mode: 0600
 
+- name: update /etc/init/ttrss-update-daemon.conf from template
+  template:
+    src: etc/init/ttrss-update-daemon.conf
+    dest: /etc/init/ttrss-update-daemon.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ttrss-update-daemon
+
 - name: update /etc/php5/fpm/pool.d/ttrss.conf from template
   template:
     src: etc/php5/fpm/pool.d/ttrss.conf
@@ -168,4 +178,5 @@
   with_items:
     - nginx
     - php5-fpm
+    - ttrss-update-daemon
 
