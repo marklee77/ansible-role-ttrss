@@ -20,6 +20,19 @@
   notify:
     - restart php5-fpm
 
+- name: ensure /var/cache/ansible directory exists
+  file:
+    path: /var/cache/ansible
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: download the ttrss install package
+  get_url:
+    url: "{{ ttrss_download_url }}"
+    dest: /var/cache/ansible/ttrss.tar.gz
+
 - name: create self-signed key/certificate pair if required
   shell: >
           openssl req -newkey rsa:2048 -x509 -nodes
@@ -43,33 +56,6 @@
     shell: /bin/bash
     state: present
 
-- name: ensure ttrss database is present
-  mysql_db:
-    name: ttrss
-
-- name: ensure ttrss database user is present
-  mysql_user:
-    name: ttrss
-    host: "{{ item }}"
-    password: "{{ ttrss_ttrss_mysql_password }}"
-    priv: ttrss.*:ALL
-  with_items:
-    - "%"
-    - localhost
-
-- name: ensure /var/cache/ansible directory exists
-  file:
-    path: /var/cache/ansible
-    owner: root
-    group: root
-    mode: 0755
-    state: directory
-
-- name: download the ttrss install package
-  get_url:
-    url: "{{ ttrss_download_url }}"
-    dest: /var/cache/ansible/ttrss.tar.gz
-
 - name: unarchive ttrss to /srv/ttrss
   command: tar --strip-components 1 -xvzf /var/cache/ansible/ttrss.tar.gz
            chdir=/srv/ttrss
@@ -81,6 +67,28 @@
     owner: ttrss
     group: ttrss
     recurse: yes
+
+- name: ensure ttrss database is present
+  mysql_db:
+    name: ttrss
+    state: present
+
+- name: ensure ttrss database user is present
+  mysql_user:
+    name: ttrss
+    host: "{{ item }}"
+    password: "{{ ttrss_ttrss_mysql_password }}"
+    priv: ttrss.*:ALL
+    state: present
+  with_items:
+    - "%"
+    - localhost
+
+- name: initialize ttrss database
+  sudo_user: ttrss
+  shell: mysql -u ttrss -p"{{ ttrss_ttrss_mysql_password }}" ttrss < /srv/ttrss/schema/ttrss_schema_mysql.sql
+         && touch /srv/ttrss/.mysql_schema
+         creates=/srv/ttrss/.mysql_schema
 
 - name: copy .my.cnf file with ttrss password credentials
   template:

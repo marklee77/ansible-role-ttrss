@@ -124,7 +124,7 @@
 	// *** Self-registrations by users ***
 	// ***********************************
 
-	define('ENABLE_REGISTRATION', false);
+	define('ENABLE_REGISTRATION', {{ ttrss_enable_registration }});
 	// Allow users to register themselves. Please be aware that allowing
 	// random people to access your tt-rss installation is a security risk
 	// and potentially might lead to data loss or server exploit. Disabled

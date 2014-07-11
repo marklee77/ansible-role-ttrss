@@ -19,3 +19,5 @@ ttrss_url: https://{{ ttrss_hostname }}/
 ttrss_admin_username: root
 ttrss_admin_password: password
 ttrss_admin_email: "{{ ttrss_admin_username }}@{{ ttrss_hostname }}"
+
+ttrss_enable_registration: false
