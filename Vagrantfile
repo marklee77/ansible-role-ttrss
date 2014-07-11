@@ -25,7 +25,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ttrss_http_port: 8080,
       ttrss_require_ssl: false,
       ttrss_url: "http://localhost:8080/",
-      ttrss_enable_registration: true,
     }
   end
 
