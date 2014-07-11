@@ -85,12 +85,6 @@
     - "%"
     - localhost
 
-- name: initialize ttrss database
-  sudo_user: ttrss
-  shell: mysql -u ttrss -p"{{ ttrss_ttrss_mysql_password }}" ttrss < /srv/ttrss/schema/ttrss_schema_mysql.sql
-         && touch /srv/ttrss/.mysql_schema
-         creates=/srv/ttrss/.mysql_schema
-
 - name: copy .my.cnf file with ttrss password credentials
   template:
     src: srv/ttrss/.my.cnf
@@ -98,6 +92,26 @@
     owner: ttrss
     group: ttrss
     mode: 0600
+
+- name: initialize ttrss database
+  sudo_user: ttrss
+  shell: mysql -u ttrss -p"{{ ttrss_ttrss_mysql_password }}" ttrss < /srv/ttrss/schema/ttrss_schema_mysql.sql
+         && touch /srv/ttrss/.mysql_schema
+         creates=/srv/ttrss/.mysql_schema
+
+- name: update /srv/ttrss/schema/admin_user_info.sql from template
+  template:
+    src: srv/ttrss/schema/admin_user_info.sql
+    dest: /srv/ttrss/schema/admin_user_info.sql
+    owner: ttrss
+    group: ttrss
+    mode: 0600
+  register: update_admin_info
+
+- name: update ttrss admin user info
+  sudo_user: ttrss
+  shell: mysql -u ttrss -p"{{ ttrss_ttrss_mysql_password }}" ttrss < /srv/ttrss/schema/admin_user_info.sql
+  when: update_admin_info|changed
 
 - name: update /srv/ttrss/config.php from template
   template:
