@@ -1,4 +1,4 @@
 private
 .vagrant
 roles/*
-!roles/marklee77.owncloud
+!roles/marklee77.ttrss

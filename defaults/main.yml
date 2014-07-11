@@ -1,17 +1,17 @@
 ---
-owncloud_run_dir: "{{ lookup('env', 'PWD') }}"
-owncloud_root_mysql_password: "{{ lookup('password', owncloud_run_dir + '/private/credentials/root-mysql-password') }}"
-owncloud_owncloud_mysql_password: "{{ lookup('password', owncloud_run_dir + '/private/credentials/owncloud-mysql-password') }}"
+ttrss_run_dir: "{{ lookup('env', 'PWD') }}"
+ttrss_root_mysql_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/root-mysql-password') }}"
+ttrss_ttrss_mysql_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-mysql-password') }}"
 
-owncloud_download_url: http://download.owncloud.org/community/owncloud-6.0.3.tar.bz2
-owncloud_hostname: localhost
-owncloud_http_port: 80
-owncloud_https_port: 443
-owncloud_require_ssl: true
+ttrss_download_url: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.12.tar.gz
+ttrss_hostname: localhost
+ttrss_http_port: 80
+ttrss_https_port: 443
+ttrss_require_ssl: true
 
-owncloud_ssl_cert_file: /usr/local/share/ca-certificates/{{ owncloud_hostname|replace(".", "_") }}.crt
-owncloud_ssl_key_file: /etc/ssl/private/{{ owncloud_hostname|replace(".", "_") }}.key
+ttrss_ssl_cert_file: /usr/local/share/ca-certificates/{{ ttrss_hostname|replace(".", "_") }}.crt
+ttrss_ssl_key_file: /etc/ssl/private/{{ ttrss_hostname|replace(".", "_") }}.key
 
-owncloud_admin_username: root
-owncloud_admin_password: password
+ttrss_admin_username: root
+ttrss_admin_password: password
 
