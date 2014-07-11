@@ -1,9 +1,11 @@
 ---
+ttrss_download_url: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.12.tar.gz
+
 ttrss_run_dir: "{{ lookup('env', 'PWD') }}"
 ttrss_root_mysql_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/root-mysql-password') }}"
 ttrss_ttrss_mysql_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-mysql-password') }}"
+ttrss_crypt_key: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-crypt-key length=24') }}"
 
-ttrss_download_url: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.12.tar.gz
 ttrss_hostname: localhost
 ttrss_http_port: 80
 ttrss_https_port: 443
@@ -12,6 +14,8 @@ ttrss_require_ssl: true
 ttrss_ssl_cert_file: /usr/local/share/ca-certificates/{{ ttrss_hostname|replace(".", "_") }}.crt
 ttrss_ssl_key_file: /etc/ssl/private/{{ ttrss_hostname|replace(".", "_") }}.key
 
+ttrss_url: https://{{ ttrss_hostname }}/
+
 ttrss_admin_username: root
 ttrss_admin_password: password
-
+ttrss_admin_email: "{{ ttrss_admin_username }}@{{ ttrss_hostname }}"

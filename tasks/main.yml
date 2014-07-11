@@ -34,7 +34,7 @@
     name: ttrss
     group: ttrss
     home: /srv/ttrss
-    createhome: no
+    createhome: yes
     shell: /bin/bash
     state: present
 
@@ -63,12 +63,12 @@
 - name: download the ttrss install package
   get_url:
     url: "{{ ttrss_download_url }}"
-    dest: /var/cache/ansible/ttrss.tar.bz2
+    dest: /var/cache/ansible/ttrss.tar.gz
 
 - name: unarchive ttrss to /srv/ttrss
-  command: tar xvjf /var/cache/ansible/ttrss.tar.bz2
-           chdir=/srv
-           creates=/srv/ttrss
+  command: tar --strip-components 1 -xvzf /var/cache/ansible/ttrss.tar.gz
+           chdir=/srv/ttrss
+           creates=/srv/ttrss/index.php
 
 - name: ensure /srv/ttrss is owned by ttrss user
   file:
@@ -81,6 +81,14 @@
   template:
     src: srv/ttrss/.my.cnf
     dest: /srv/ttrss/.my.cnf
+    owner: ttrss
+    group: ttrss
+    mode: 0600
+
+- name: update /srv/ttrss/config.php from template
+  template:
+    src: srv/ttrss/config.php
+    dest: /srv/ttrss/config.php
     owner: ttrss
     group: ttrss
     mode: 0600
