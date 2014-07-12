@@ -1,3 +1,4 @@
+filter_plugins/*.pyc
 private
 .vagrant
 roles/*
