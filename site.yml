@@ -2,4 +2,5 @@
   sudo: True
   roles:
     - marklee77.mariadb
+    - marklee77.modules-extra
     - marklee77.ttrss
