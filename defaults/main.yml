@@ -20,3 +20,16 @@ ttrss_admin_username: admin
 ttrss_admin_password: password
 ttrss_admin_password_salt: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-admin-password-salt length=8') }}"
 ttrss_admin_email: "{{ ttrss_admin_username }}@{{ ttrss_hostname }}"
+
+ttrss_contrib_plugins:
+  - auth_imap
+  - auth_ldap
+  - auth_radius
+  - googleplus
+  - identica
+  - owncloud
+  - pinterest
+  - pocket
+  - tweet 
+
+ttrss_enable_ldap: false

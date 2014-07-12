@@ -6,6 +6,8 @@
     update_cache: yes 
     cache_valid_time: 600
   with_items:
+    - curl
+    - git-core
     - nginx
     - openssl
     - php5-cli
@@ -21,6 +23,20 @@
   notify:
     - restart php5-fpm
 
+- name: ensure that ttrss user exists in ldap
+  ldap:
+    bind_dn: cn=admin,{{ ldap_auth_base_dn }}
+    bind_password: "{{ ldap_auth_admin_password }}"
+    entry_dn: uid=ttrss,ou=services,{{ ldap_auth_base_dn }}
+    attributes:
+      - objectClass: account
+      - objectClass: simpleSecurityObject
+      - uid: ttrss
+      - userPassword: "{{ ttrss_ldap_password|ssha_password_hash(ttrss_ldap_password_salt) }}"
+    modify_action: replace
+    state: present
+  when: ttrss_enable_ldap
+ 
 - name: ensure /var/cache/ansible directory exists
   file:
     path: /var/cache/ansible
@@ -61,6 +77,21 @@
   command: tar --strip-components 1 -xvzf /var/cache/ansible/ttrss.tar.gz
            chdir=/srv/ttrss
            creates=/srv/ttrss/index.php
+
+- name: check out contrib plugins from github
+  git:
+    repo: https://github.com/gothfox/Tiny-Tiny-RSS-Contrib.git
+    dest: /srv/ttrss/contrib
+    update: yes
+    accept_hostkey: yes
+
+- name: create links to selected contrib plugins
+  file:
+    path: /srv/ttrss/plugins/{{ item }}
+    src: /srv/ttrss/contrib/plugins/{{ item }}
+    state: link
+  with_items: ttrss_contrib_plugins
+    
 
 - name: ensure /srv/ttrss is owned by ttrss user
   file:

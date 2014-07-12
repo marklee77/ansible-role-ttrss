@@ -217,3 +217,20 @@
 	// if necessary (after migrating all new options from this file).
 
 	// vim:ft=php
+
+{% if ttrss_enable_ldap %}
+    define('LDAP_AUTH_SERVER_URI', '{{ ldap_auth_url }}');
+    define('LDAP_AUTH_USETLS', {{ ldap_auth_require_ssl }});
+    define('LDAP_AUTH_ALLOW_UNTRUSTED_CERT', FALSE); 
+    define('LDAP_AUTH_BINDDN', 'uid=ttrss,ou=services,{{ ldap_auth_base_dn }}');
+    define('LDAP_AUTH_BINDPW', '{{ ttrss_ldap_password }}');
+    define('LDAP_AUTH_BASEDN', '{{ ldap_auth_base_dn }}');
+    define('LDAP_AUTH_ANONYMOUSBEFOREBIND', FALSE);
+    // ??? will be replaced with the entered username(escaped) at login
+    define('LDAP_AUTH_SEARCHFILTER', '(&(objectClass=person)(uid=???))');
+    // Optional configuration
+    define('LDAP_AUTH_SCHEMA_CACHE_ENABLE', TRUE);
+    define('LDAP_AUTH_SCHEMA_CACHE_TIMEOUT', 86400);
+    define('LDAP_AUTH_LOG_ATTEMPTS', FALSE);
+    define('LDAP_AUTH_DEBUG', FALSE);
+{% endif %}
