@@ -38,28 +38,6 @@
     modify_action: replace
     state: present
   when: ttrss_enable_ldap
- 
-- name: ensure /var/cache/ansible directory exists
-  file:
-    path: /var/cache/ansible
-    owner: root
-    group: root
-    mode: 0755
-    state: directory
-
-- name: download the ttrss install package
-  get_url:
-    url: "{{ ttrss_download_url }}"
-    dest: /var/cache/ansible/ttrss.tar.gz
-
-- name: create self-signed key/certificate pair if required
-  shell: >
-          openssl req -newkey rsa:2048 -x509 -nodes
-          -days 365 -subj "/CN={{ ttrss_hostname }}"
-          -out {{ ttrss_ssl_cert_file }}
-          -keyout {{ ttrss_ssl_key_file }} &&
-          update-ca-certificates
-          creates={{ ttrss_ssl_cert_file }}
 
 - name: ensure that ttrss group exists
   group:
@@ -75,60 +53,30 @@
     shell: /bin/bash
     state: present
 
+- name: ensure /var/cache/ansible directory exists
+  file:
+    path: /var/cache/ansible
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: download the ttrss install package
+  get_url:
+    url: "{{ ttrss_download_url }}"
+    dest: /var/cache/ansible/ttrss.tar.gz
+
 - name: unarchive ttrss to /srv/ttrss
   command: tar --strip-components 1 -xvzf /var/cache/ansible/ttrss.tar.gz
            chdir=/srv/ttrss
            creates=/srv/ttrss/index.php
 
-- name: check out contrib plugins from github
-  git:
-    repo: https://github.com/gothfox/Tiny-Tiny-RSS-Contrib.git
-    dest: /srv/ttrss/contrib
-    update: yes
-    accept_hostkey: yes
-
-- name: create links to selected contrib plugins
+- name: ensure everything in /srv/ttrss is owned by ttrss user
   file:
-    path: /srv/ttrss/plugins/{{ item }}
-    src: /srv/ttrss/contrib/plugins/{{ item }}
-    state: link
-  with_items: ttrss_contrib_plugins
-    
-- name: ensure that external plugin directory exists
-  file:
-    path: /srv/ttrss/external
-    state: directory
+    path: /srv/ttrss
     owner: ttrss
     group: ttrss
-    mode: 0755
-
-- name: check out external plugin repositories
-  git:
-    repo: "{{ item.repo }}"
-    dest: /srv/ttrss/external/{{ item.name }}
-    update: yes
-  with_items: ttrss_gitrepo_plugins
-
-- name: create links to external plugins
-  file:
-    path: /srv/ttrss/plugins/{{ item.name }}
-    src: /srv/ttrss/external/{{ item.name }}/{{ item.subdir }}
-    state: link
-  with_items: ttrss_gitrepo_plugins
-
-- name: check out external theme repositories
-  git:
-    repo: "{{ item.repo }}"
-    dest: /srv/ttrss/themes/{{ item.name }}
-    update: yes
-  with_items: ttrss_gitrepo_themes
-
-- name: create links to external theme css files
-  file:
-    path: /srv/ttrss/themes/{{ item.name }}.css
-    src: /srv/ttrss/themes/{{ item.name }}/{{ item.name }}.css
-    state: link
-  with_items: ttrss_gitrepo_themes
+    recurse: yes
 
 - name: ensure ttrss database is present
   mysql_db:
@@ -174,6 +122,59 @@
   shell: mysql -u ttrss -p"{{ ttrss_ttrss_mysql_password }}" ttrss < /srv/ttrss/schema/admin_user_info.sql
   when: update_admin_info|changed
 
+- name: check out contrib plugins from github
+  sudo_user: ttrss
+  git:
+    repo: https://github.com/gothfox/Tiny-Tiny-RSS-Contrib.git
+    dest: /srv/ttrss/contrib
+    update: yes
+    accept_hostkey: yes
+
+- name: create links to selected contrib plugins
+  file:
+    path: /srv/ttrss/plugins/{{ item }}
+    src: /srv/ttrss/contrib/plugins/{{ item }}
+    state: link
+  with_items: ttrss_contrib_plugins
+    
+- name: ensure that external plugin directory exists
+  file:
+    path: /srv/ttrss/external
+    state: directory
+    owner: ttrss
+    group: ttrss
+    mode: 0755
+
+- name: check out external plugin repositories
+  sudo_user: ttrss
+  git:
+    repo: "{{ item.repo }}"
+    dest: /srv/ttrss/external/{{ item.name }}
+    update: yes
+  with_items: ttrss_gitrepo_plugins
+
+- name: create links to external plugins
+  file:
+    path: /srv/ttrss/plugins/{{ item.name }}
+    src: /srv/ttrss/external/{{ item.name }}/{{ item.subdir }}
+    state: link
+  with_items: ttrss_gitrepo_plugins
+
+- name: check out external theme repositories
+  sudo_user: ttrss
+  git:
+    repo: "{{ item.repo }}"
+    dest: /srv/ttrss/themes/{{ item.name }}
+    update: yes
+  with_items: ttrss_gitrepo_themes
+
+- name: create links to external theme css files
+  file:
+    path: /srv/ttrss/themes/{{ item.name }}.css
+    src: /srv/ttrss/themes/{{ item.name }}/{{ item.name }}.css
+    state: link
+  with_items: ttrss_gitrepo_themes
+
 - name: update /srv/ttrss/config.php from template
   template:
     src: srv/ttrss/config.php
@@ -181,13 +182,6 @@
     owner: ttrss
     group: ttrss
     mode: 0600
-
-- name: ensure everything in /srv/ttrss is owned by ttrss user
-  file:
-    path: /srv/ttrss
-    owner: ttrss
-    group: ttrss
-    recurse: yes
 
 - name: update /etc/init/ttrss-update-daemon.conf from template
   template:
@@ -208,6 +202,15 @@
     mode: 0644
   notify:
     - restart php5-fpm
+
+- name: create self-signed key/certificate pair if required
+  shell: >
+          openssl req -newkey rsa:2048 -x509 -nodes
+          -days 365 -subj "/CN={{ ttrss_hostname }}"
+          -out {{ ttrss_ssl_cert_file }}
+          -keyout {{ ttrss_ssl_key_file }} &&
+          update-ca-certificates
+          creates={{ ttrss_ssl_cert_file }}
 
 - name: update /etc/nginx/sites-available/ttrss from template
   template:
