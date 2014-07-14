@@ -67,16 +67,9 @@
     dest: /var/cache/ansible/ttrss.tar.gz
 
 - name: unarchive ttrss to /srv/ttrss
-  command: tar --strip-components 1 -xvzf /var/cache/ansible/ttrss.tar.gz
+  command: sudo -u ttrss tar --strip-components 1 -xvzf /var/cache/ansible/ttrss.tar.gz
            chdir=/srv/ttrss
            creates=/srv/ttrss/index.php
-
-- name: ensure everything in /srv/ttrss is owned by ttrss user
-  file:
-    path: /srv/ttrss
-    owner: ttrss
-    group: ttrss
-    recurse: yes
 
 - name: ensure ttrss database is present
   mysql_db:
@@ -134,6 +127,8 @@
   file:
     path: /srv/ttrss/plugins/{{ item }}
     src: /srv/ttrss/contrib/plugins/{{ item }}
+    owner: ttrss
+    group: ttrss
     state: link
   with_items: ttrss_contrib_plugins
     
@@ -157,6 +152,8 @@
   file:
     path: /srv/ttrss/plugins/{{ item.name }}
     src: /srv/ttrss/external/{{ item.name }}/{{ item.subdir }}
+    owner: ttrss
+    group: ttrss
     state: link
   with_items: ttrss_gitrepo_plugins
 
@@ -172,6 +169,8 @@
   file:
     path: /srv/ttrss/themes/{{ item.name }}.css
     src: /srv/ttrss/themes/{{ item.name }}/{{ item.name }}.css
+    owner: ttrss
+    group: ttrss
     state: link
   with_items: ttrss_gitrepo_themes
 
