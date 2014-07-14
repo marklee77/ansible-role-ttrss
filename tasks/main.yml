@@ -8,6 +8,7 @@
   with_items:
     - curl
     - git-core
+    - libxml2-utils
     - nginx
     - openssl
     - php5-cli
@@ -17,6 +18,7 @@
     - php5-json
     - php5-mcrypt
     - php5-mysql
+    - tidy
 
 - name: ensure that mcrypt module is enabled
   command: php5enmod mcrypt creates=/etc/php5/fpm/conf.d/20-mcrypt.ini
@@ -92,13 +94,41 @@
     state: link
   with_items: ttrss_contrib_plugins
     
-
-- name: ensure /srv/ttrss is owned by ttrss user
+- name: ensure that external plugin directory exists
   file:
-    path: /srv/ttrss
+    path: /srv/ttrss/external
+    state: directory
     owner: ttrss
     group: ttrss
-    recurse: yes
+    mode: 0755
+
+- name: check out external plugin repositories
+  git:
+    repo: "{{ item.repo }}"
+    dest: /srv/ttrss/external/{{ item.name }}
+    update: yes
+  with_items: ttrss_gitrepo_plugins
+
+- name: create links to external plugins
+  file:
+    path: /srv/ttrss/plugins/{{ item.name }}
+    src: /srv/ttrss/external/{{ item.name }}/{{ item.subdir }}
+    state: link
+  with_items: ttrss_gitrepo_plugins
+
+- name: check out external theme repositories
+  git:
+    repo: "{{ item.repo }}"
+    dest: /srv/ttrss/themes/{{ item.name }}
+    update: yes
+  with_items: ttrss_gitrepo_themes
+
+- name: create links to external theme css files
+  file:
+    path: /srv/ttrss/themes/{{ item.name }}.css
+    src: /srv/ttrss/themes/{{ item.name }}/{{ item.name }}.css
+    state: link
+  with_items: ttrss_gitrepo_themes
 
 - name: ensure ttrss database is present
   mysql_db:
@@ -151,6 +181,13 @@
     owner: ttrss
     group: ttrss
     mode: 0600
+
+- name: ensure everything in /srv/ttrss is owned by ttrss user
+  file:
+    path: /srv/ttrss
+    owner: ttrss
+    group: ttrss
+    recurse: yes
 
 - name: update /etc/init/ttrss-update-daemon.conf from template
   template:

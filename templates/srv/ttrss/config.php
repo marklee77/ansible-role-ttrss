@@ -197,7 +197,11 @@
 	// if you experience weird errors and tt-rss failing to start, blank pages
 	// after login, or content encoding errors, disable it.
 
+{% if ttrss_enable_ldap %}
+	define('PLUGINS', 'auth_ldap, auth_internal, note, updater');
+{% else %}
 	define('PLUGINS', 'auth_internal, note, updater');
+{% endif %}
 	// Comma-separated list of plugins to load automatically for all users.
 	// System plugins have to be specified here. Please enable at least one
 	// authentication plugin here (auth_*).

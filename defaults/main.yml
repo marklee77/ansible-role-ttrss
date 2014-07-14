@@ -32,4 +32,22 @@ ttrss_contrib_plugins:
   - pocket
   - tweet 
 
+ttrss_gitrepo_plugins:
+  - { name: facebook, repo: "https://github.com/dotdavid/ttrss-facebook.git", subdir: facebook }
+  - { name: feedmod, repo: "https://github.com/mbirth/ttrss_plugin-af_feedmod.git", subdir: . }
+  - { name: flattr, repo: "https://github.com/nhoening/ttrss-flattr.git", subdir: . }
+  - { name: instaread, repo: "https://github.com/ebell451/tt-rss_plugin_instaread.git", subdir: instaread } 
+  - { name: newsplus, repo: "https://github.com/hrk/tt-rss-newsplus-plugin.git", subdir: api_newsplus }
+  - { name: qrcodegen, repo: "https://github.com/jonrandoem/ttrss-qrcode.git", subdir: . }
+  - { name: readability, repo: "https://github.com/ebell451/tt-rss_plugin_readabillity.git", subdir: readability }
+  - { name: semanticscuttle, repo: "https://github.com/versvs/ttrss2scuttle.git", subdir: semanticscuttle }
+  - { name: sendtokindle, repo: "https://github.com/usr42/ttrss-sendtokindle.git", subdir: . }
+  - { name: videoframes, repo: "https://github.com/tribut/ttrss-videoframes.git", subdir: videoframes }
+  - { name: xmllint, repo: "https://github.com/fastcat/tt-rss-ff-xmllint.git", subdir: . }
+
+ttrss_gitrepo_themes:
+  - { name: clean-greader, repo: "https://github.com/naeramarth7/clean-greader.git" }
+  - { name: feedly, repo: "https://github.com/levito/tt-rss-feedly-theme.git" }
+  - { name: reeder, repo: "https://github.com/tschinz/tt-rss_reeder_theme.git" }
+
 ttrss_enable_ldap: false
