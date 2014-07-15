@@ -5,6 +5,9 @@ ttrss_run_dir: "{{ lookup('env', 'PWD') }}"
 ttrss_root_mysql_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/root-mysql-password') }}"
 ttrss_ttrss_mysql_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-mysql-password') }}"
 ttrss_crypt_key: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-crypt-key length=24') }}"
+ttrss_ldap_password: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-ldap-password') }}"
+ttrss_ldap_password_salt: "{{ lookup('password', ttrss_run_dir + '/private/credentials/ttrss-ldap-password-salt length=4') }}"
+
 
 ttrss_hostname: localhost
 ttrss_http_port: 80
