@@ -1,5 +1,5 @@
+.vagrant
 filter_plugins/*.pyc
 private
-.vagrant
 roles/*
 !roles/marklee77.ttrss
